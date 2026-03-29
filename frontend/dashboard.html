@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - College Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>College MS</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li class="admin-only"><a href="students.html">Students</a></li>
+                <li class="admin-only"><a href="teachers.html">Teachers</a></li>
+                <li><a href="courses.html">Courses</a></li>
+                <li class="teacher-only"><a href="attendance.html">Attendance</a></li>
+                <li class="teacher-only"><a href="grades.html">Grades</a></li>
+                <li class="admin-only"><a href="fees.html">Fees</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header>
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <span id="userRole" class="role-badge"></span>
+                </div>
+            </header>
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be loaded here -->
+            </div>
+            <div class="recent-activities">
+                <h2>Recent Activities</h2>
+                <div id="recentActivities"></div>
+            </div>
+        </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

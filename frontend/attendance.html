@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - College Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>College MS</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="teachers.html">Teachers</a></li>
+                <li><a href="courses.html">Courses</a></li>
+                <li><a href="attendance.html" class="active">Attendance</a></li>
+                <li><a href="grades.html">Grades</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header>
+                <h1>Attendance Management</h1>
+            </header>
+            
+            <div class="attendance-controls">
+                <div class="form-group">
+                    <label>Select Course:</label>
+                    <select id="courseSelect" onchange="loadCourseStudents()">
+                        <option value="">Select a course</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="attendanceDate" value="">
+                </div>
+                <button class="btn btn-primary" onclick="markAttendance()">Save Attendance</button>
+            </div>
+            
+            <div id="attendanceSection" style="display:none;">
+                <h3>Mark Attendance</h3>
+                <div class="table-container">
+                    <table id="attendanceTable">
+                        <thead>
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceList"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="attendance-reports">
+                <h3>Attendance Reports</h3>
+                <div class="form-group">
+                    <label>Select Student:</label>
+                    <select id="reportStudentSelect" onchange="loadStudentAttendance()">
+                        <option value="">Select a student</option>
+                    </select>
+                </div>
+                <div id="attendanceStats"></div>
+                <div id="attendanceHistory"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/attendance.js"></script>
+</body>
+</html>
