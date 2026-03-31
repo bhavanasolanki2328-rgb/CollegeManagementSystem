@@ -9,9 +9,7 @@
 <body>
     <div class="dashboard-container">
         <nav class="sidebar">
-            <div class="sidebar-header">
-                <h2>College MS</h2>
-            </div>
+            <div class="sidebar-header"><h2>College MS</h2></div>
             <ul class="sidebar-menu">
                 <li><a href="dashboard.html">Dashboard</a></li>
                 <li><a href="students.html" class="active">Students</a></li>
@@ -26,101 +24,96 @@
         <div class="main-content">
             <header>
                 <h1>Student Management</h1>
-                <button class="btn btn-primary" onclick="showAddStudentModal()">Add New Student</button>
+                <button class="btn btn-primary" onclick="showAddModal()">Add New Student</button>
             </header>
-            
-            <div class="filters">
-                <input type="text" id="searchInput" placeholder="Search by name or roll number..." onkeyup="searchStudents()">
-                <select id="departmentFilter" onchange="filterStudents()">
-                    <option value="">All Departments</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Mechanical">Mechanical</option>
-                    <option value="Civil">Civil</option>
-                </select>
-                <select id="semesterFilter" onchange="filterStudents()">
-                    <option value="">All Semesters</option>
-                    <option value="1">Semester 1</option>
-                    <option value="2">Semester 2</option>
-                    <option value="3">Semester 3</option>
-                    <option value="4">Semester 4</option>
-                    <option value="5">Semester 5</option>
-                    <option value="6">Semester 6</option>
-                    <option value="7">Semester 7</option>
-                    <option value="8">Semester 8</option>
-                </select>
-            </div>
-            
             <div class="table-container">
-                <table id="studentsTable">
-                    <thead>
-                        <tr>
-                            <th>Roll Number</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Department</th>
-                            <th>Semester</th>
-                            <th>Batch</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                <table>
+                    <thead><tr><th>Roll Number</th><th>Name</th><th>Email</th><th>Department</th><th>Semester</th><th>Actions</th></tr></thead>
                     <tbody id="studentsList"></tbody>
                 </table>
             </div>
         </div>
     </div>
     
-    <!-- Add/Edit Student Modal -->
-    <div id="studentModal" class="modal">
+    <div id="studentModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Add New Student</h2>
+            <h2>Add Student</h2>
             <form id="studentForm">
-                <input type="hidden" id="studentId">
-                <div class="form-group">
-                    <label>Name:</label>
-                    <input type="text" id="name" required>
-                </div>
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label>Password:</label>
-                    <input type="password" id="password" required>
-                </div>
-                <div class="form-group">
-                    <label>Roll Number:</label>
-                    <input type="text" id="rollNumber" required>
-                </div>
-                <div class="form-group">
-                    <label>Department:</label>
-                    <select id="department" required>
-                        <option value="Computer Science">Computer Science</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Mechanical">Mechanical</option>
-                        <option value="Civil">Civil</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Semester:</label>
-                    <input type="number" id="semester" min="1" max="8" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone:</label>
-                    <input type="text" id="phone">
-                </div>
-                <div class="form-group">
-                    <label>Address:</label>
-                    <textarea id="address"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Student</button>
+                <input type="text" id="name" placeholder="Full Name" required><br><br>
+                <input type="email" id="email" placeholder="Email" required><br><br>
+                <input type="password" id="password" placeholder="Password" required><br><br>
+                <input type="text" id="rollNumber" placeholder="Roll Number" required><br><br>
+                <select id="department" required>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Electronics">Electronics</option>
+                </select><br><br>
+                <input type="number" id="semester" placeholder="Semester" required><br><br>
+                <button type="submit" class="btn btn-primary">Save</button>
             </form>
         </div>
     </div>
     
-    <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/students.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        
+        async function loadStudents() {
+            const res = await fetch('http://localhost:5000/api/students', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const students = await res.json();
+            const tbody = document.getElementById('studentsList');
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.rollNumber}</td>
+                    <td>${s.userId?.name}</td>
+                    <td>${s.userId?.email}</td>
+                    <td>${s.department}</td>
+                    <td>${s.semester}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteStudent('${s._id}')">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        async function deleteStudent(id) {
+            if(confirm('Delete?')) {
+                await fetch(`http://localhost:5000/api/students/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadStudents();
+            }
+        }
+        
+        function showAddModal() {
+            document.getElementById('studentModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+        
+        document.getElementById('studentForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                rollNumber: document.getElementById('rollNumber').value,
+                department: document.getElementById('department').value,
+                semester: parseInt(document.getElementById('semester').value)
+            };
+            await fetch('http://localhost:5000/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(data)
+            });
+            closeModal();
+            loadStudents();
+        });
+        
+        loadStudents();
+    </script>
 </body>
 </html>

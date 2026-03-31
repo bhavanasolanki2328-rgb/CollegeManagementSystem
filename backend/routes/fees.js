@@ -1,12 +1,12 @@
 const express = require('express');
 const Fee = require('../models/Fee');
 const Student = require('../models/Student');
-const { auth, checkRole } = require('../middleware/auth');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Create/Update fee record (Admin only)
-router.post('/', auth, checkRole(['admin']), async (req, res) => {
+router.post('/', protect, restrictTo(['admin']), async (req, res) => {
     try {
         const { studentId, semester, totalFee, paidAmount, paymentDetails } = req.body;
         
@@ -37,7 +37,7 @@ router.post('/', auth, checkRole(['admin']), async (req, res) => {
 });
 
 // Get fee details for a student
-router.get('/student/:studentId', auth, async (req, res) => {
+router.get('/student/:studentId', protect, async (req, res) => {
     try {
         const fees = await Fee.find({ studentId: req.params.studentId })
             .sort({ semester: -1 });
@@ -58,7 +58,7 @@ router.get('/student/:studentId', auth, async (req, res) => {
 });
 
 // Get all fee records (Admin only)
-router.get('/', auth, checkRole(['admin']), async (req, res) => {
+router.get('/', protect, restrictTo(['admin']), async (req, res) => {
     try {
         const fees = await Fee.find()
             .populate('studentId', 'rollNumber')
@@ -74,7 +74,7 @@ router.get('/', auth, checkRole(['admin']), async (req, res) => {
 });
 
 // Record payment (Admin only)
-router.post('/payment', auth, checkRole(['admin']), async (req, res) => {
+router.post('/payment', protect, restrictTo(['admin']), async (req, res) => {
     try {
         const { studentId, semester, amount, mode, transactionId } = req.body;
         

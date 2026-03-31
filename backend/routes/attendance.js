@@ -2,12 +2,12 @@ const express = require('express');
 const Attendance = require('../models/Attendance');
 const Course = require('../models/Course');
 const Student = require('../models/Student');
-const { auth, checkRole } = require('../middleware/auth');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Mark attendance (Teacher only)
-router.post('/', auth, checkRole(['teacher', 'admin']), async (req, res) => {
+router.post('/', protect, restrictTo(['teacher', 'admin']), async (req, res) => {
     try {
         const { courseId, date, records } = req.body;
         
@@ -36,7 +36,7 @@ router.post('/', auth, checkRole(['teacher', 'admin']), async (req, res) => {
 });
 
 // Get attendance for a course
-router.get('/course/:courseId', auth, async (req, res) => {
+router.get('/course/:courseId', protect, async (req, res) => {
     try {
         const { date } = req.query;
         let query = { courseId: req.params.courseId };
@@ -56,7 +56,7 @@ router.get('/course/:courseId', auth, async (req, res) => {
 });
 
 // Get student attendance
-router.get('/student/:studentId', auth, async (req, res) => {
+router.get('/student/:studentId', protect, async (req, res) => {
     try {
         const { courseId, from, to } = req.query;
         let query = { studentId: req.params.studentId };

@@ -32,16 +32,48 @@
                 </div>
             </header>
             <div class="stats-grid" id="statsGrid">
-                <!-- Stats will be loaded here -->
-            </div>
-            <div class="recent-activities">
-                <h2>Recent Activities</h2>
-                <div id="recentActivities"></div>
+                <div class="stat-card">
+                    <h3>Loading...</h3>
+                    <div class="stat-value">-</div>
+                </div>
             </div>
         </div>
     </div>
-    <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        
+        async function loadStats() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                
+                if (user.role === 'admin') {
+                    const studentsRes = await fetch('http://localhost:5000/api/students', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const teachersRes = await fetch('http://localhost:5000/api/teachers', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const coursesRes = await fetch('http://localhost:5000/api/courses', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    const students = await studentsRes.json();
+                    const teachers = await teachersRes.json();
+                    const courses = await coursesRes.json();
+                    
+                    document.getElementById('statsGrid').innerHTML = `
+                        <div class="stat-card"><h3>Total Students</h3><div class="stat-value">${students.length || 0}</div><div style="font-size:30px;">👨‍🎓</div></div>
+                        <div class="stat-card"><h3>Total Teachers</h3><div class="stat-value">${teachers.length || 0}</div><div style="font-size:30px;">👨‍🏫</div></div>
+                        <div class="stat-card"><h3>Total Courses</h3><div class="stat-value">${courses.length || 0}</div><div style="font-size:30px;">📚</div></div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        loadStats();
+    </script>
 </body>
 </html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resources - Teacher Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Teacher Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="teacher-dashboard.html">Dashboard</a></li>
+                <li><a href="courses.html">My Courses</a></li>
+                <li><a href="attendance.html">Mark Attendance</a></li>
+                <li><a href="grades.html">Enter Grades</a></li>
+                <li><a href="resources.html" class="active">Upload Resources</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        
+        <div class="main-content">
+            <header>
+                <h1>Upload Study Resources</h1>
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <span id="userRole" class="role-badge">Teacher</span>
+                </div>
+            </header>
+            
+            <div class="dashboard-card">
+                <h3>Upload New Resource</h3>
+                <form id="resourceForm">
+                    <div class="form-group">
+                        <label>Title:</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Course:</label>
+                        <select id="courseId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>File Type:</label>
+                        <select id="fileType">
+                            <option value="pdf">PDF</option>
+                            <option value="ppt">PowerPoint</option>
+                            <option value="doc">Document</option>
+                            <option value="link">Link</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>File URL or Link:</label>
+                        <input type="text" id="fileUrl" placeholder="https://...">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Resource</button>
+                </form>
+            </div>
+            
+            <div class="dashboard-card" style="margin-top: 20px;">
+                <h3>My Uploaded Resources</h3>
+                <div id="resourcesList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token || user.role !== 'teacher') {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('userName').textContent = user.name;
+        
+        // Load courses for dropdown
+        async function loadCourses() {
+            const res = await fetch('http://localhost:5000/api/courses', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const courses = await res.json();
+            const select = document.getElementById('courseId');
+            select.innerHTML = '<option value="">Select Course</option>' +
+                courses.map(c => `<option value="${c._id}">${c.courseName}</option>`).join('');
+        }
+        
+        // Load existing resources
+        async function loadResources() {
+            const res = await fetch('http://localhost:5000/api/resources', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const resources = await res.json();
+            const container = document.getElementById('resourcesList');
+            
+            if (resources.length === 0) {
+                container.innerHTML = '<p>No resources uploaded yet</p>';
+                return;
+            }
+            
+            container.innerHTML = resources.map(r => `
+                <div style="border-bottom: 1px solid #eee; padding: 10px;">
+                    <strong>${r.title}</strong><br>
+                    <small>${r.courseId?.courseName}</small>
+                    <p>${r.description || ''}</p>
+                    <button onclick="deleteResource('${r._id}')" class="btn btn-sm btn-danger">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        // Handle form submission
+        document.getElementById('resourceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                courseId: document.getElementById('courseId').value,
+                fileType: document.getElementById('fileType').value,
+                fileUrl: document.getElementById('fileUrl').value
+            };
+            
+            await fetch('http://localhost:5000/api/resources', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+            
+            alert('Resource uploaded!');
+            document.getElementById('resourceForm').reset();
+            loadResources();
+        });
+        
+        async function deleteResource(id) {
+            if (confirm('Delete this resource?')) {
+                await fetch(`http://localhost:5000/api/resources/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadResources();
+            }
+        }
+        
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = 'login.html';
+        });
+        
+        loadCourses();
+        loadResources();
+    </script>
+</body>
+</html>

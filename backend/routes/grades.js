@@ -2,7 +2,7 @@ const express = require('express');
 const Grade = require('../models/Grade');
 const Course = require('../models/Course');
 const Student = require('../models/Student');
-const { auth, checkRole } = require('../middleware/auth');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ const calculateGrade = (marks) => {
 };
 
 // Add/Update grades (Teacher only)
-router.post('/', auth, checkRole(['teacher', 'admin']), async (req, res) => {
+router.post('/', protect, restrictTo(['teacher', 'admin']), async (req, res) => {
     try {
         const { studentId, courseId, semester, internalMarks, externalMarks, remarks } = req.body;
         
@@ -46,7 +46,7 @@ router.post('/', auth, checkRole(['teacher', 'admin']), async (req, res) => {
 });
 
 // Get grades for a student
-router.get('/student/:studentId', auth, async (req, res) => {
+router.get('/student/:studentId', protect, async (req, res) => {
     try {
         const grades = await Grade.find({ studentId: req.params.studentId })
             .populate('courseId', 'courseName courseCode credits');
@@ -81,7 +81,7 @@ router.get('/student/:studentId', auth, async (req, res) => {
 });
 
 // Get grades for a course
-router.get('/course/:courseId', auth, async (req, res) => {
+router.get('/course/:courseId', protect, async (req, res) => {
     try {
         const grades = await Grade.find({ courseId: req.params.courseId })
             .populate('studentId', 'rollNumber')

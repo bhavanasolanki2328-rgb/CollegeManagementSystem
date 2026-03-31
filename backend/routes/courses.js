@@ -1,11 +1,11 @@
 const express = require('express');
 const Course = require('../models/Course');
-const { auth, checkRole } = require('../middleware/auth');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Get all courses
-router.get('/', auth, async (req, res) => {
+router.get('/', protect, async (req, res) => {
     try {
         let query = {};
         
@@ -24,7 +24,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get single course
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
     try {
         const course = await Course.findById(req.params.id).populate('teacherId', 'userId');
         if (!course) {
@@ -37,7 +37,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Create course (Admin only)
-router.post('/', auth, checkRole(['admin']), async (req, res) => {
+router.post('/', protect, restrictTo(['admin']), async (req, res) => {
     try {
         const course = new Course(req.body);
         await course.save();
@@ -48,7 +48,7 @@ router.post('/', auth, checkRole(['admin']), async (req, res) => {
 });
 
 // Update course (Admin only)
-router.put('/:id', auth, checkRole(['admin']), async (req, res) => {
+router.put('/:id', protect, restrictTo(['admin']), async (req, res) => {
     try {
         const course = await Course.findByIdAndUpdate(
             req.params.id,
@@ -65,7 +65,7 @@ router.put('/:id', auth, checkRole(['admin']), async (req, res) => {
 });
 
 // Delete course (Admin only)
-router.delete('/:id', auth, checkRole(['admin']), async (req, res) => {
+router.delete('/:id', protect, restrictTo(['admin']), async (req, res) => {
     try {
         const course = await Course.findByIdAndDelete(req.params.id);
         if (!course) {

@@ -1,38 +1,52 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const JWT_SECRET = 'your-secret-key-change-this-in-production';
+// IMPORTANT: Use the SAME secret for both signing and verifying
+const JWT_SECRET = 'your-super-secret-key-2024';
 
-const auth = async (req, res, next) => {
+// Middleware to protect routes
+const protect = async (req, res, next) => {
     try {
-        const token = req.header('Authorization')?.replace('Bearer ', '');
+        let token;
+        
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        }
         
         if (!token) {
-            throw new Error();
+            return res.status(401).json({ error: 'Not authorized, please login' });
         }
-
+        
+        // Verify with the SAME secret
         const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById(decoded.userId);
+        const user = await User.findById(decoded.id).select('-password');
         
         if (!user) {
-            throw new Error();
+            return res.status(401).json({ error: 'User not found' });
         }
-
+        
         req.user = user;
-        req.token = token;
         next();
     } catch (error) {
-        res.status(401).json({ error: 'Please authenticate' });
+        console.error('Auth error:', error.message);
+        return res.status(401).json({ error: 'Not authorized' });
     }
 };
 
-const checkRole = (roles) => {
+// Restrict to roles
+const restrictTo = (...roles) => {
     return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'Not authenticated' });
+        }
+        
         if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ error: 'Access denied' });
+            return res.status(403).json({ 
+                error: `Access denied. ${req.user.role} cannot perform this action.` 
+            });
         }
         next();
     };
 };
 
-module.exports = { auth, checkRole, JWT_SECRET };
+module.exports = { protect, restrictTo, JWT_SECRET };
