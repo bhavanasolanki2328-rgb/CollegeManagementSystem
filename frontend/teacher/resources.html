@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resources</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Teacher Portal</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="courses.html">My Courses</a></li>
+                <li><a href="attendance.html">Mark Attendance</a></li>
+                <li><a href="grades.html">Enter Grades</a></li>
+                <li><a href="resources.html" class="active">Upload Resources</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-content">
+            <header>
+                <h1>Upload Resources</h1>
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <span id="userRole" class="role-badge">Teacher</span>
+                </div>
+            </header>
+
+            <div class="dashboard-card">
+                <form id="resourceForm">
+
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Course</label>
+                        <select id="courseId" required></select>
+                    </div>
+
+                    <!-- ✅ NEW -->
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="department" required>
+                            <option value="CSE">CSE</option>
+                            <option value="ISE">ISE</option>
+                            <option value="ECE">ECE</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select id="semester" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload File</label>
+                        <input type="file" id="file" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Upload Resource</button>
+                </form>
+            </div>
+
+            <div class="dashboard-card" style="margin-top:20px">
+                <h3>My Uploaded Resources</h3>
+                <div id="myResources"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        document.getElementById('resourceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('courseId', document.getElementById('courseId').value);
+            formData.append('department', document.getElementById('department').value);
+            formData.append('semester', document.getElementById('semester').value);
+
+            // ✅ THIS LINE TAKES FILE INPUT
+            formData.append('file', document.getElementById('file').files[0]);
+
+            await fetch('http://localhost:5000/api/resources', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            alert('File uploaded');
+        });
+    </script>
+
+</body>
+
+</html>

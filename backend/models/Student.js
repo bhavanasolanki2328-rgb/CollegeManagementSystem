@@ -23,10 +23,34 @@ const StudentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    phone: String,
-    address: String,
-    parentName: String,
-    parentPhone: String,
+    enrollmentYear: {
+        type: String,
+        default: ''
+    },
+    phone: {
+        type: String,
+        default: ''
+    },
+    address: {
+        type: String,
+        default: ''
+    },
+    parentName: {
+        type: String,
+        default: ''
+    },
+    parentPhone: {
+        type: String,
+        default: ''
+    },
+    dateOfBirth: {
+        type: String,
+        default: ''
+    },
+    bloodGroup: {
+        type: String,
+        default: ''
+    },
     enrollmentDate: {
         type: Date,
         default: Date.now

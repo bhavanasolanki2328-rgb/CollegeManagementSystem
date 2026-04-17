@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Teachers</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Admin Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html">Students</a></li>
+                <li><a href="teachers.html" class="active">Teachers</a></li>
+                <li><a href="courses.html">Courses</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header>
+                <h1>Teacher Management</h1>
+                <button class="btn btn-primary" onclick="showAddModal()">Add New Teacher</button>
+            </header>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="teacherModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add/Edit Teacher</h2>
+            <form id="teacherForm">
+                <div class="form-group"><label>Full Name</label><input type="text" id="name" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="email" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="password" placeholder="Leave blank to keep current"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Employee ID</label><input type="text" id="employeeId" required></div>
+                    <div class="form-group"><label>Department</label><select id="department"><option value="Computer Science">CS</option><option value="Electronics">EC</option><option value="Mechanical">ME</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Designation</label><input type="text" id="designation" placeholder="Professor/Asst. Professor"></div>
+                    <div class="form-group"><label>Qualification</label><input type="text" id="qualification" placeholder="M.Tech, Ph.D"></div>
+                </div>
+                <div class="form-group"><label>Phone</label><input type="text" id="phone"></div>
+                <button type="submit" class="btn btn-primary">Save Teacher</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        let editingId = null;
+        const token = localStorage.getItem('token');
+
+        async function loadTeachers() {
+            const res = await fetch('http://localhost:5000/api/teachers', { headers: { Authorization: `Bearer ${token}` } });
+            const teachers = await res.json();
+            document.getElementById('teachersList').innerHTML = teachers.map(t => `
+                <tr>
+                    <td>${t.employeeId}</td>
+                    <td>${t.userId?.name}</td>
+                    <td>${t.userId?.email}</td>
+                    <td>${t.department}</td>
+                    <td>${t.designation || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editTeacher('${t._id}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTeacher('${t._id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteTeacher(id) {
+            if(confirm('Delete this teacher?')) {
+                await fetch(`http://localhost:5000/api/teachers/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+                loadTeachers();
+            }
+        }
+
+        async function editTeacher(id) {
+            const res = await fetch(`http://localhost:5000/api/teachers/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+            const t = await res.json();
+            editingId = id;
+            document.getElementById('name').value = t.userId?.name;
+            document.getElementById('email').value = t.userId?.email;
+            document.getElementById('employeeId').value = t.employeeId;
+            document.getElementById('department').value = t.department;
+            document.getElementById('designation').value = t.designation || '';
+            document.getElementById('qualification').value = t.qualification || '';
+            document.getElementById('phone').value = t.phone || '';
+            document.getElementById('teacherModal').style.display = 'block';
+        }
+
+        function showAddModal() { editingId = null; document.getElementById('teacherForm').reset(); document.getElementById('teacherModal').style.display = 'block'; }
+        function closeModal() { document.getElementById('teacherModal').style.display = 'none'; }
+
+        document.getElementById('teacherForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                employeeId: document.getElementById('employeeId').value,
+                department: document.getElementById('department').value,
+                designation: document.getElementById('designation').value,
+                qualification: document.getElementById('qualification').value,
+                phone: document.getElementById('phone').value
+            };
+            const url = editingId ? `http://localhost:5000/api/teachers/${editingId}` : 'http://localhost:5000/api/teachers';
+            const method = editingId ? 'PUT' : 'POST';
+            await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(data) });
+            closeModal();
+            loadTeachers();
+        });
+
+        loadTeachers();
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 const express = require('express');
 const Timetable = require('../models/Timetable');
-const { protect } = require('../middleware/auth');
+const { protect, restrictTo} = require('../middleware/auth');
 
 const router = express.Router();
 

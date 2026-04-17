@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar"><div class="sidebar-header"><h2>Student Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="attendance.html" class="active">Attendance</a></li>
+                <li><a href="grades.html">Grades</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="timetable.html">Timetable</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header><h1>My Attendance</h1><div class="user-info"><span id="userName"></span><span id="userRole" class="role-badge">Student</span></div></header>
+            <div class="dashboard-card"><div id="attendanceDetails"><div class="empty-state"><div class="empty-state-icon">📊</div><h4>No Attendance Records</h4><p>No attendance marked yet.</p></div></div></div>
+        </div>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script>
+        (async () => {
+            const token = localStorage.getItem('token');
+            const user = getCurrentUser();
+            let studentId = null;
+            try {
+                const studentRes = await fetch(`http://localhost:5000/api/students/email/${user.email}`, { headers: { Authorization: `Bearer ${token}` } });
+                if(studentRes.ok) studentId = (await studentRes.json())._id;
+                if(studentId) {
+                    const attRes = await fetch(`http://localhost:5000/api/attendance/student/${studentId}`, { headers: { Authorization: `Bearer ${token}` } });
+                    if(attRes.ok) {
+                        const data = await attRes.json();
+                        if(data.records?.length) {
+                            document.getElementById('attendanceDetails').innerHTML = `
+                                <div class="attendance-bar"><div class="attendance-fill" style="width:${data.statistics.attendancePercentage}%">${data.statistics.attendancePercentage}%</div></div>
+                                <table>${data.records.map(r => `<tr><td>${new Date(r.date).toLocaleDateString()}</td><td>${r.courseId?.courseName}</td><td class="status-badge status-${r.status}">${r.status}</td></tr>`).join('')}</table>
+                            `;
+                        }
+                    }
+                }
+            } catch(e) { console.error(e); }
+        })();
+    </script>
+</body>
+</html>

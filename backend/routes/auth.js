@@ -1,11 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Student = require('../models/Student');  // ← ADD THIS LINE
 const { JWT_SECRET } = require('../middleware/auth');
 const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
-
 
 // Check if admin already exists (for frontend to know)
 router.get('/check-admin-exists', async (req, res) => {
@@ -133,5 +133,26 @@ router.get('/me', protect, async (req, res) => {
         user: req.user
     });
 });
+
+// ========== ADD THIS NEW ENDPOINT (RIGHT HERE, BEFORE module.exports) ==========
+// Get complete student profile by email
+router.get('/student-profile/:email', protect, async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.params.email });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        const student = await Student.findOne({ userId: user._id }).populate('userId', 'name email');
+        if (!student) {
+            return res.status(404).json({ error: 'Student profile not found' });
+        }
+        
+        res.json(student);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+// ========== END OF ADDED CODE ==========
 
 module.exports = router;

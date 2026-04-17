@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students - Admin</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .filters-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filters-bar .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .student-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            margin: 20px auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+        .close:hover {
+            color: #333;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Admin Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="students.html" class="active">Students</a></li>
+                <li><a href="teachers.html">Teachers</a></li>
+                <li><a href="courses.html">Courses</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header>
+                <h1>Student Management</h1>
+                <button class="btn btn-primary" id="addStudentBtn">+ Add New Student</button>
+            </header>
+
+            <div class="filters-bar">
+                <div class="form-group">
+                    <label>🏛️ Filter by Department</label>
+                    <select id="filterDepartment">
+                        <option value="">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Mechanical">Mechanical</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Electrical">Electrical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📚 Filter by Semester</label>
+                    <select id="filterSemester">
+                        <option value="">All Semesters</option>
+                        <option value="1">1st Semester</option>
+                        <option value="2">2nd Semester</option>
+                        <option value="3">3rd Semester</option>
+                        <option value="4">4th Semester</option>
+                        <option value="5">5th Semester</option>
+                        <option value="6">6th Semester</option>
+                        <option value="7">7th Semester</option>
+                        <option value="8">8th Semester</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" onclick="applyFilters()">🔍 Apply Filters</button>
+                    <button class="btn btn-secondary" onclick="clearFilters()" style="background: #6c757d;">🗑️ Clear</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Student List</h3>
+                    <span class="student-count" id="studentCount">0 Students</span>
+                </div>
+                <table style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Batch</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsList">
+                        <tr><td colspan="8" style="text-align:center; padding:40px;">Loading students...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Add New Student</h2>
+            <div id="modalError" class="error-msg"></div>
+            <div id="modalSuccess" class="success-msg"></div>
+            <form id="studentForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Roll Number *</label>
+                        <input type="text" id="rollNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department *</label>
+                        <select id="department" required>
+                            <option value="">-- Select --</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Semester *</label>
+                        <input type="number" id="semester" min="1" max="8" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Batch *</label>
+                        <input type="text" id="batch" placeholder="2021-2025" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="phone">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="address" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Student</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        let editingId = null;
+        let allStudents = [];
+
+        function openModal() {
+            document.getElementById('studentModal').style.display = 'block';
+            document.getElementById('modalError').style.display = 'none';
+            document.getElementById('modalSuccess').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').style.display = 'none';
+            editingId = null;
+        }
+
+        function showAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('password').required = true;
+            document.getElementById('password').placeholder = 'Enter password';
+            openModal();
+        }
+
+        async function loadStudents() {
+            try {
+                const res = await fetch(`${API_URL}/students`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                allStudents = await res.json();
+                displayStudents(allStudents);
+                document.getElementById('studentCount').textContent = `${allStudents.length} Students`;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function displayStudents(students) {
+            const tbody = document.getElementById('studentsList');
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">No students found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.rollNumber || 'N/A'}</td>
+                    <td>${s.userId?.name || 'N/A'}</td>
+                    <td>${s.userId?.email || 'N/A'}</td>
+                    <td>${s.department || 'N/A'}</td>
+                    <td>${s.semester || 'N/A'}</td>
+                    <td>${s.batch || 'N/A'}</td>
+                    <td>${s.phone || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editStudent('${s._id}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s._id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const department = document.getElementById('filterDepartment').value;
+            const semester = document.getElementById('filterSemester').value;
+            let filtered = [...allStudents];
+            if (department) filtered = filtered.filter(s => s.department === department);
+            if (semester) filtered = filtered.filter(s => s.semester === parseInt(semester));
+            displayStudents(filtered);
+            document.getElementById('studentCount').textContent = `${filtered.length} Students`;
+        }
+
+        function clearFilters() {
+            document.getElementById('filterDepartment').value = '';
+            document.getElementById('filterSemester').value = '';
+            displayStudents(allStudents);
+            document.getElementById('studentCount').textContent = `${allStudents.length} Students`;
+        }
+
+        async function deleteStudent(id) {
+            if (confirm('Delete this student?')) {
+                await fetch(`${API_URL}/students/${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                loadStudents();
+            }
+        }
+
+        async function editStudent(id) {
+            try {
+                const res = await fetch(`${API_URL}/students/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const student = await res.json();
+                editingId = id;
+                document.getElementById('modalTitle').textContent = 'Edit Student';
+                document.getElementById('name').value = student.userId?.name || '';
+                document.getElementById('email').value = student.userId?.email || '';
+                document.getElementById('password').placeholder = 'Leave blank to keep current';
+                document.getElementById('password').required = false;
+                document.getElementById('rollNumber').value = student.rollNumber || '';
+                document.getElementById('department').value = student.department || '';
+                document.getElementById('semester').value = student.semester || '';
+                document.getElementById('batch').value = student.batch || '';
+                document.getElementById('phone').value = student.phone || '';
+                document.getElementById('address').value = student.address || '';
+                openModal();
+            } catch (error) {
+                alert('Error loading student');
+            }
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+            
+            const errorDiv = document.getElementById('modalError');
+            const successDiv = document.getElementById('modalSuccess');
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            const studentData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                rollNumber: document.getElementById('rollNumber').value,
+                department: document.getElementById('department').value,
+                semester: parseInt(document.getElementById('semester').value),
+                batch: document.getElementById('batch').value,
+                phone: document.getElementById('phone').value || '',
+                address: document.getElementById('address').value || ''
+            };
+            
+            console.log('Sending data:', studentData);
+            
+            try {
+                const url = editingId ? `${API_URL}/students/${editingId}` : `${API_URL}/students`;
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify(studentData)
+                });
+                
+                const result = await response.json();
+                console.log('Server response:', result);
+                
+                if (response.ok) {
+                    successDiv.textContent = editingId ? 'Student updated successfully!' : 'Student added successfully!';
+                    successDiv.style.display = 'block';
+                    setTimeout(() => {
+                        closeModal();
+                        loadStudents();
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = result.error || 'Failed to save student';
+                    errorDiv.style.display = 'block';
+                    saveBtn.textContent = editingId ? 'Update Student' : 'Save Student';
+                    saveBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.textContent = 'Network error. Please check backend connection.';
+                errorDiv.style.display = 'block';
+                saveBtn.textContent = editingId ? 'Update Student' : 'Save Student';
+                saveBtn.disabled = false;
+            }
+        });
+
+        const addBtn = document.getElementById('addStudentBtn');
+        if (addBtn) {
+            addBtn.onclick = showAddModal;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../login.html';
+        });
+
+        loadStudents();
+    </script>
+</body>
+</html>

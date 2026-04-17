@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Grades</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Teacher Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="courses.html">My Courses</a></li>
+                <li><a href="attendance.html">Mark Attendance</a></li>
+                <li><a href="grades.html" class="active">Enter Grades</a></li>
+                <li><a href="resources.html">Upload Resources</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header><h1>Enter Grades</h1><div class="user-info"><span id="userName"></span><span id="userRole" class="role-badge">Teacher</span></div></header>
+            <div class="dashboard-card">
+                <div class="form-group"><label>Select Course</label><select id="courseSelect"></select></div>
+                <div class="form-group"><label>Semester</label><input type="number" id="semester" min="1" max="8"></div>
+                <button class="btn btn-primary" onclick="loadStudents()">Load Students</button>
+                <div id="studentGrades"></div>
+                <button class="btn btn-success" onclick="saveGrades()" style="margin-top:20px">Save Grades</button>
+            </div>
+        </div>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        let currentCourse = null;
+
+        async function loadCourses() {
+            const res = await fetch('http://localhost:5000/api/courses', { headers: { Authorization: `Bearer ${token}` } });
+            const courses = await res.json();
+            document.getElementById('courseSelect').innerHTML = courses.map(c => `<option value="${c._id}">${c.courseName}</option>`).join('');
+        }
+
+        async function loadStudents() {
+            currentCourse = document.getElementById('courseSelect').value;
+            const semester = document.getElementById('semester').value;
+            if(!currentCourse || !semester) return alert('Select course and semester');
+            const studentsRes = await fetch('http://localhost:5000/api/students', { headers: { Authorization: `Bearer ${token}` } });
+            const students = await studentsRes.json();
+            document.getElementById('studentGrades').innerHTML = `
+                <table><thead><tr><th>Student</th><th>Internal (40)</th><th>External (60)</th></tr></thead>
+                <tbody>${students.map(s => `<tr><td>${s.userId?.name} (${s.rollNumber})</td><td><input type="number" class="internal" data-id="${s._id}" min="0" max="40"></td><td><input type="number" class="external" data-id="${s._id}" min="0" max="60"></td></tr>`).join('')}</tbody></table>
+            `;
+        }
+
+        async function saveGrades() {
+            const semester = parseInt(document.getElementById('semester').value);
+            const internals = Array.from(document.querySelectorAll('.internal'));
+            const externals = Array.from(document.querySelectorAll('.external'));
+            for(let i=0; i<internals.length; i++) {
+                const studentId = internals[i].dataset.id;
+                const internalMarks = parseInt(internals[i].value) || 0;
+                const externalMarks = parseInt(externals[i].value) || 0;
+                await fetch('http://localhost:5000/api/grades', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ studentId, courseId: currentCourse, semester, internalMarks, externalMarks })
+                });
+            }
+            alert('Grades saved');
+        }
+
+        loadCourses();
+    </script>
+</body>
+</html>

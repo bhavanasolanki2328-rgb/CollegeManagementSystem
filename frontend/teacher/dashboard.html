@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar"><div class="sidebar-header"><h2>Teacher Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="courses.html">My Courses</a></li>
+                <li><a href="attendance.html">Mark Attendance</a></li>
+                <li><a href="grades.html">Enter Grades</a></li>
+                <li><a href="resources.html">Upload Resources</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header><h1>Teacher Dashboard</h1><div class="user-info"><span id="userName"></span><span id="userRole" class="role-badge">Teacher</span></div></header>
+            <div class="quick-stats"><div class="stat-box"><div class="stat-number" id="courseCount">0</div><div class="stat-label">My Courses</div></div></div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card" onclick="location.href='attendance.html'"><div class="card-icon">📝</div><h3>Mark Attendance</h3></div>
+                <div class="dashboard-card" onclick="location.href='grades.html'"><div class="card-icon">📊</div><h3>Enter Grades</h3></div>
+                <div class="dashboard-card" onclick="location.href='courses.html'"><div class="card-icon">📚</div><h3>My Courses</h3></div>
+                <div class="dashboard-card" onclick="location.href='resources.html'"><div class="card-icon">📄</div><h3>Upload Resources</h3></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script>
+        (async () => {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:5000/api/courses', { headers: { Authorization: `Bearer ${token}` } });
+            const courses = await res.json();
+            document.getElementById('courseCount').innerText = courses.length;
+        })();
+    </script>
+</body>
+</html>

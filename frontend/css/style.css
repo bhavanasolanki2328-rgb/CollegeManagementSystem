@@ -1,4 +1,4 @@
-/* Add at the top of the file */
+/* ========== RESET & BASE ========== */
 * {
     margin: 0;
     padding: 0;
@@ -18,6 +18,7 @@ body {
     padding: 20px;
 }
 
+/* ========== CONTAINERS ========== */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -27,7 +28,6 @@ body {
     justify-content: center;
 }
 
-/* Login container styles */
 .login-container {
     width: 100%;
     display: flex;
@@ -46,100 +46,6 @@ body {
     margin: 20px;
 }
 
-/* Make forms scrollable if content overflows */
-.login-card,
-.dashboard-container,
-.main-content {
-    overflow-y: auto;
-    max-height: 90vh;
-}
-
-/* Dashboard container fix */
-.dashboard-container {
-    display: flex;
-    min-height: 100vh;
-    overflow-y: auto;
-}
-
-.main-content {
-    flex: 1;
-    margin-left: 250px;
-    padding: 20px;
-    background: #f5f7fa;
-    overflow-y: auto;
-    max-height: 100vh;
-}
-
-/* Table container for horizontal scroll on small screens */
-.table-container {
-    background: white;
-    border-radius: 10px;
-    overflow-x: auto;
-    overflow-y: visible;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    padding: 20px;
-    margin-top: 20px;
-}
-
-/* Responsive fix for mobile */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    
-    .main-content {
-        margin-left: 0;
-        max-height: none;
-    }
-    
-    .login-card {
-        margin: 10px;
-        padding: 20px;
-    }
-    
-    body {
-        padding: 10px;
-    }
-}
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Login Page Styles */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-.login-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-}
-
 .login-header {
     text-align: center;
     margin-bottom: 30px;
@@ -154,90 +60,11 @@ body {
     color: #666;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #333;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.btn-danger {
-    background: #dc3545;
-    color: white;
-}
-
-.btn-success {
-    background: #28a745;
-    color: white;
-}
-
-.error-message {
-    color: #dc3545;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.demo-credentials {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 5px;
-}
-
-.demo-credentials h3 {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.demo-credentials p {
-    font-size: 12px;
-    margin: 5px 0;
-}
-
-/* Dashboard Styles */
+/* ========== DASHBOARD LAYOUT ========== */
 .dashboard-container {
     display: flex;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -283,8 +110,11 @@ body {
     margin-left: 250px;
     padding: 20px;
     background: #f5f7fa;
+    overflow-y: auto;
+    max-height: 100vh;
 }
 
+/* ========== HEADER ========== */
 header {
     background: white;
     padding: 20px;
@@ -307,8 +137,10 @@ header {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 12px;
+    color: white;
 }
 
+/* ========== STATS GRID & CARDS ========== */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -340,6 +172,70 @@ header {
     color: #333;
 }
 
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.dashboard-card h3 {
+    margin-bottom: 10px;
+    color: #667eea;
+}
+
+.card-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* ========== QUICK STATS ========== */
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 14px;
+    margin-top: 5px;
+    opacity: 0.9;
+}
+
+/* ========== TABLES ========== */
 .table-container {
     background: white;
     border-radius: 10px;
@@ -372,76 +268,97 @@ tr:hover {
     background: #f8f9fa;
 }
 
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    animation: fadeIn 0.3s;
-}
-
-.modal-content {
-    background: white;
-    margin: 50px auto;
-    padding: 30px;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 10px;
-    animation: slideDown 0.3s;
-}
-
-.close {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #999;
-}
-
-.close:hover {
-    color: #333;
-}
-
-/* Filters */
-.filters {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
+/* ========== FORMS ========== */
+.form-group {
     margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
 }
 
-.filters input,
-.filters select {
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    flex: 1;
-    min-width: 200px;
+    font-size: 16px;
 }
 
-/* Attendance Table */
-.attendance-controls {
-    background: white;
-    padding: 20px;
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+/* ========== ATTENDANCE & GRADES ========== */
+.attendance-bar {
+    background: #f0f0f0;
     border-radius: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    flex-wrap: wrap;
+    overflow: hidden;
+    margin: 10px 0;
 }
 
-.attendance-status {
+.attendance-fill {
+    background: linear-gradient(90deg, #28a745, #20c997);
+    height: 30px;
     display: flex;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    transition: width 0.3s;
 }
 
 .status-badge {
@@ -466,138 +383,173 @@ tr:hover {
     color: #856404;
 }
 
-/* Fee Summary Cards */
-.summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.card p {
-    font-size: 24px;
+.grade-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
     font-weight: bold;
-    color: #333;
 }
 
-/* Hero Section */
-.hero {
+.grade-O { background: #28a745; color: white; }
+.grade-A { background: #20c997; color: white; }
+.grade-B { background: #17a2b8; color: white; }
+.grade-C { background: #ffc107; color: #856404; }
+.grade-F { background: #dc3545; color: white; }
+
+/* ========== EMPTY STATES ========== */
+.empty-state {
     text-align: center;
-    padding: 60px 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-}
-
-.hero h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.hero p {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.hero-buttons {
-    margin-bottom: 40px;
-}
-
-.features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-top: 40px;
-}
-
-.feature-card {
-    padding: 20px;
+    padding: 40px 20px;
     background: #f8f9fa;
     border-radius: 10px;
-    transition: transform 0.3s;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-.feature-card h3 {
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.feature-card p {
-    font-size: 14px;
     color: #666;
 }
 
-/* Form Row */
-.form-row {
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.empty-state h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+/* ========== TIMETABLE ========== */
+.timetable-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.timetable-day {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-@keyframes slideDown {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.timetable-day h4 {
+    color: #667eea;
+    margin-bottom: 10px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-    
-    .stats-grid,
-    .summary-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+.class-item {
+    padding: 8px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 5px;
+    font-size: 12px;
 }
-/* Modal styles - make it scrollable */
+
+.schedule-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.schedule-time {
+    background: #667eea;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.schedule-course {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.schedule-course strong {
+    display: block;
+    color: #333;
+}
+
+.schedule-room {
+    font-size: 12px;
+    color: #666;
+}
+
+/* ========== FEE STATUS ========== */
+.fee-status {
+    text-align: center;
+    padding: 15px;
+}
+
+.fee-amount {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.fee-paid { color: #28a745; }
+.fee-due { color: #dc3545; }
+
+/* ========== PROFILE INFO ========== */
+.profile-info {
+    display: grid;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #666;
+}
+
+.info-value {
+    color: #333;
+}
+
+/* ========== RESOURCES ========== */
+.resource-item, .announcement-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.resource-item:hover, .announcement-item:hover {
+    background: #f8f9fa;
+}
+
+.resource-title {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.btn-download {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.btn-download:hover {
+    background: #218838;
+}
+
+/* ========== MODAL ========== */
 .modal {
     display: none;
     position: fixed;
@@ -607,7 +559,6 @@ tr:hover {
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
-    animation: fadeIn 0.3s;
     overflow-y: auto;
     padding: 20px;
 }
@@ -617,116 +568,66 @@ tr:hover {
     margin: 20px auto;
     padding: 30px;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     border-radius: 10px;
-    animation: slideDown 0.3s;
     max-height: 90vh;
     overflow-y: auto;
-    position: relative;
 }
 
-/* For very long forms, ensure they scroll */
-.modal-content form {
-    max-height: calc(90vh - 100px);
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-/* Custom scrollbar for modal */
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 5px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 5px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Form groups spacing */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #333;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-/* Close button */
 .close {
     float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
     color: #999;
-    position: sticky;
-    top: 0;
-    background: white;
-    padding: 0 0 10px 0;
-    margin-bottom: 10px;
 }
 
 .close:hover {
     color: #333;
 }
 
-/* Buttons */
-.btn {
-    padding: 10px 20px;
-    border: none;
+/* ========== WARNING NOTE ========== */
+.warning-note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin-top: 20px;
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
+    color: #856404;
+    font-size: 14px;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.btn-sm {
-    padding: 5px 10px;
-    font-size: 12px;
-}
-
-.btn-danger {
-    background: #dc3545;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #c82333;
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        max-height: none;
+    }
+    
+    .login-card {
+        margin: 10px;
+        padding: 20px;
+    }
+    
+    body {
+        padding: 10px;
+    }
+    
+    .stats-grid,
+    .dashboard-grid,
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
 }

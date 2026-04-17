@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Grades</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Student Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="grades.html" class="active">Grades</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="timetable.html">Timetable</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header><h1>My Grades</h1><div class="user-info"><span id="userName"></span><span id="userRole" class="role-badge">Student</span></div></header>
+            <div class="dashboard-card" id="gradesContainer">
+                <div class="empty-state"><div class="empty-state-icon">📖</div><h4>No Grades Available</h4><p>Your results will appear here once published.</p></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script>
+        (async () => {
+            const token = localStorage.getItem('token');
+            const user = getCurrentUser();
+            try {
+                const studentRes = await fetch(`http://localhost:5000/api/students/email/${user.email}`, { headers: { Authorization: `Bearer ${token}` } });
+                if(studentRes.ok) {
+                    const student = await studentRes.json();
+                    const gradesRes = await fetch(`http://localhost:5000/api/grades/student/${student._id}`, { headers: { Authorization: `Bearer ${token}` } });
+                    if(gradesRes.ok) {
+                        const data = await gradesRes.json();
+                        if(data.grades?.length) {
+                            document.getElementById('gradesContainer').innerHTML = `
+                                <table><thead><tr><th>Course</th><th>Internal</th><th>External</th><th>Total</th><th>Grade</th></tr></thead>
+                                <tbody>${data.grades.map(g => `<tr><td>${g.courseId?.courseName}</td><td>${g.internalMarks}</td><td>${g.externalMarks}</td><td>${g.totalMarks}</td><td class="grade-badge grade-${g.grade?.charAt(0)}">${g.grade}</td></tr>`).join('')}</tbody></table>
+                                <div style="margin-top:20px;text-align:center"><strong>SGPA: ${data.summary?.sgpa || 0}</strong></div>
+                            `;
+                        }
+                    }
+                }
+            } catch(e) { console.error(e); }
+        })();
+    </script>
+</body>
+</html>

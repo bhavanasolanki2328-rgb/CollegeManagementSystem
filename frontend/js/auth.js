@@ -1,158 +1,98 @@
-// Check if user is logged in
+const API_URL = 'http://localhost:5000/api';
+
 function isAuthenticated() {
-    const token = localStorage.getItem('token');
-    return !!token;
+    return !!localStorage.getItem('token');
 }
 
-// Get current user
 function getCurrentUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
 }
 
-// Logout function
 function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('profile');
-    window.location.href = 'login.html';
+    localStorage.clear();
+    window.location.href = '../login.html';
 }
 
-// Protect pages - redirect to login if not authenticated
-function protectPage() {
-    const publicPages = ['login.html', 'register-admin.html', 'setup.html', 'index.html'];
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    if (!publicPages.includes(currentPage) && !isAuthenticated()) {
-        window.location.href = 'login.html';
-        return false;
-    }
-    return true;
-}
-
-// Check first time setup
-async function checkFirstTimeSetup() {
+async function fetchCompleteStudentProfile(email, token) {
     try {
-        const response = await fetch('http://localhost:5000/api/auth/check-admin-exists');
-        const data = await response.json();
-        
-        // No admin exists and not on setup page
-        if (!data.adminExists && !window.location.pathname.includes('register-admin.html') && !window.location.pathname.includes('setup.html')) {
-            window.location.href = 'register-admin.html';
-            return false;
-        }
-        
-        // Admin exists and on setup page
-        if (data.adminExists && (window.location.pathname.includes('register-admin.html') || window.location.pathname.includes('setup.html'))) {
-            window.location.href = 'login.html';
-            return false;
-        }
-        
-        return true;
-    } catch (error) {
-        console.error('Error:', error);
-        return false;
+        const res = await fetch(`${API_URL}/students/email/${email}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) return await res.json();
+    } catch (e) {
+        console.log('Could not fetch student profile');
     }
-}
-
-// Display user info on dashboard pages
-function displayUserInfo() {
-    const user = getCurrentUser();
-    if (user) {
-        if (document.getElementById('userName')) {
-            document.getElementById('userName').textContent = user.name;
-        }
-        if (document.getElementById('userRole')) {
-            document.getElementById('userRole').textContent = user.role.toUpperCase();
-        }
-    }
-}
-
-// Update menu based on role
-function updateMenuByRole() {
-    const user = getCurrentUser();
-    if (!user) return;
-    
-    document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = user.role === 'admin' ? 'block' : 'none';
-    });
-    
-    document.querySelectorAll('.teacher-only').forEach(el => {
-        el.style.display = user.role === 'teacher' ? 'block' : 'none';
-    });
-    
-    document.querySelectorAll('.student-only').forEach(el => {
-        el.style.display = user.role === 'student' ? 'block' : 'none';
-    });
+    return null;
 }
 
 // Handle login
 if (document.getElementById('loginForm')) {
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('errorMessage');
-        
-        errorDiv.textContent = 'Logging in...';
-        errorDiv.style.color = 'blue';
-        
+        errorDiv.textContent = '';
+        const btn = document.querySelector('#loginForm button');
+        const originalText = btn.textContent;
+        btn.textContent = 'Logging in...';
+        btn.disabled = true;
+
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.error || 'Login failed');
-            }
-            
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Login failed');
+
             localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
-            errorDiv.textContent = 'Login successful! Redirecting...';
-            errorDiv.style.color = 'green';
-            
-            // Redirect based on role
-            setTimeout(() => {
-                if (data.user.role === 'admin') {
-                    window.location.href = 'dashboard.html';
-                } else if (data.user.role === 'teacher') {
-                    window.location.href = 'teacher-dashboard.html';
-                } else if (data.user.role === 'student') {
-                    window.location.href = 'student-dashboard.html';
+            let user = data.user;
+
+            if (user.role === 'student') {
+                const studentData = await fetchCompleteStudentProfile(email, data.token);
+                if (studentData) {
+                    user = { ...user, ...studentData };
                 }
-            }, 1000);
-        } catch (error) {
-            errorDiv.textContent = error.message;
-            errorDiv.style.color = 'red';
+            }
+            localStorage.setItem('user', JSON.stringify(user));
+
+            if (user.role === 'admin') window.location.href = 'admin/dashboard.html';
+            else if (user.role === 'teacher') window.location.href = 'teacher/dashboard.html';
+            else if (user.role === 'student') window.location.href = 'student/dashboard.html';
+        } catch (err) {
+            errorDiv.textContent = err.message;
+            btn.textContent = originalText;
+            btn.disabled = false;
         }
     });
 }
 
-// Handle logout
-if (document.getElementById('logoutBtn')) {
-    document.getElementById('logoutBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        logout();
-    });
+// Protect pages
+const publicPages = ['login.html', 'index.html'];
+const currentPath = window.location.pathname;
+const currentFile = currentPath.split('/').pop();
+if (!publicPages.includes(currentFile) && !isAuthenticated()) {
+    window.location.href = '../login.html';
 }
 
-// Initialize on page load - ONLY protect routes, NO auto-redirects
-(async function() {
-    await checkFirstTimeSetup();
-    protectPage();
-    
-    // Only show user info if on a dashboard page
-    const currentPage = window.location.pathname.split('/').pop();
-    const dashboardPages = ['dashboard.html', 'teacher-dashboard.html', 'student-dashboard.html'];
-    
-    if (isAuthenticated() && dashboardPages.includes(currentPage)) {
-        displayUserInfo();
-        updateMenuByRole();
+function displayUserInfo() {
+    const user = getCurrentUser();
+    if (user) {
+        if (document.getElementById('userName')) document.getElementById('userName').textContent = user.name;
+        if (document.getElementById('userRole')) document.getElementById('userRole').textContent = user.role?.toUpperCase();
     }
-})();
+}
+
+function setupLogout() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logout(); });
+}
+
+// Auto-initialize on dashboard pages
+if (document.querySelector('.main-content')) {
+    displayUserInfo();
+    setupLogout();
+}

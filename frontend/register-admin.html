@@ -5,11 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setup Admin - College Management System</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .message-box {
+            text-align: center;
+            padding: 20px;
+        }
+        .message-box .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .message-box h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .message-box p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .btn-go-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-go-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="login-container">
-            <div class="login-card">
+            <div class="login-card" id="mainCard">
                 <div class="login-header">
                     <h1>Create Admin Account</h1>
                     <p>First time setup</p>
@@ -33,7 +65,43 @@
             </div>
         </div>
     </div>
+
     <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // Check if admin already exists before showing the form
+        async function checkAdminExists() {
+            try {
+                const response = await fetch(`${API_URL}/auth/check-admin-exists`);
+                const data = await response.json();
+                
+                if (data.adminExists) {
+                    // Admin already exists - show message instead of form
+                    document.getElementById('mainCard').innerHTML = `
+                        <div class="message-box">
+                            <div class="icon">⚠️</div>
+                            <h2>System Already Configured</h2>
+                            <p>An admin account has already been created.</p>
+                            <p>Only one admin can be registered for security reasons.</p>
+                            <a href="login.html" class="btn-go-home">Go to Login</a>
+                        </div>
+                    `;
+                }
+                // If no admin exists, form remains visible
+            } catch (error) {
+                console.error('Error checking admin:', error);
+                document.getElementById('mainCard').innerHTML = `
+                    <div class="message-box">
+                        <div class="icon">⚠️</div>
+                        <h2>Connection Error</h2>
+                        <p>Could not connect to the server. Please make sure the backend is running.</p>
+                        <a href="javascript:location.reload()" class="btn-go-home">Try Again</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Handle form submission
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -46,7 +114,7 @@
             messageDiv.style.color = 'blue';
             
             try {
-                const response = await fetch('http://localhost:5000/api/auth/register-first-admin', {
+                const response = await fetch(`${API_URL}/auth/register-first-admin`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
@@ -65,7 +133,7 @@
                 messageDiv.style.color = 'green';
                 
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'admin/dashboard.html';
                 }, 2000);
                 
             } catch (error) {
@@ -73,6 +141,9 @@
                 messageDiv.style.color = 'red';
             }
         });
+
+        // Run the check when page loads
+        checkAdminExists();
     </script>
 </body>
 </html>

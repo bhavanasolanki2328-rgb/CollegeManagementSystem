@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Student</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Student Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="profile.html" class="active">My Profile</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="grades.html">Grades</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="timetable.html">Timetable</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header>
+                <h1>My Profile</h1>
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <span id="userRole" class="role-badge">Student</span>
+                </div>
+            </header>
+            
+            <div class="dashboard-card">
+                <h2 style="color: #667eea; margin-bottom: 20px;">📋 Personal Information</h2>
+                <div class="profile-info" id="personalInfo"></div>
+            </div>
+            
+            <div class="dashboard-card" style="margin-top: 20px;">
+                <h2 style="color: #667eea; margin-bottom: 20px;">🎓 Academic Information</h2>
+                <div class="profile-info" id="academicInfo"></div>
+            </div>
+            
+            <div class="dashboard-card" style="margin-top: 20px;">
+                <h2 style="color: #667eea; margin-bottom: 20px;">📞 Contact Information</h2>
+                <div class="profile-info" id="contactInfo"></div>
+            </div>
+            
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.href='dashboard.html'">← Back to Dashboard</button>
+        </div>
+    </div>
+    
+    <script src="../js/auth.js"></script>
+    <script>
+        // Get data directly from localStorage (what was stored during registration/login)
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        document.getElementById('userName').textContent = user.name || 'Student';
+        
+        // Personal Information
+        document.getElementById('personalInfo').innerHTML = `
+            <div class="info-row"><span class="info-label">📛 Full Name:</span><span class="info-value">${user.name || 'Not Provided'}</span></div>
+            <div class="info-row"><span class="info-label">📧 Email:</span><span class="info-value">${user.email || 'Not Provided'}</span></div>
+            <div class="info-row"><span class="info-label">🎂 Date of Birth:</span><span class="info-value">${user.dateOfBirth || 'Not Provided'}</span></div>
+            <div class="info-row"><span class="info-label">🩸 Blood Group:</span><span class="info-value">${user.bloodGroup || 'Not Provided'}</span></div>
+        `;
+        
+        // Academic Information
+        document.getElementById('academicInfo').innerHTML = `
+            <div class="info-row"><span class="info-label">🔢 Roll Number:</span><span class="info-value">${user.rollNumber || 'Not Assigned'}</span></div>
+            <div class="info-row"><span class="info-label">🏛️ Department:</span><span class="info-value">${user.department || 'Not Assigned'}</span></div>
+            <div class="info-row"><span class="info-label">📚 Semester:</span><span class="info-value">${user.semester || 'Not Assigned'}</span></div>
+            <div class="info-row"><span class="info-label">🎓 Batch:</span><span class="info-value">${user.batch || 'Not Assigned'}</span></div>
+            <div class="info-row"><span class="info-label">📅 Enrollment Year:</span><span class="info-value">${user.enrollmentYear || 'Not Assigned'}</span></div>
+        `;
+        
+        // Contact Information
+        document.getElementById('contactInfo').innerHTML = `
+            <div class="info-row"><span class="info-label">📞 Phone Number:</span><span class="info-value">${user.phone || 'Not Provided'}</span></div>
+            <div class="info-row"><span class="info-label">📍 Address:</span><span class="info-value">${user.address || 'Not Provided'}</span></div>
+            <div class="info-row"><span class="info-label">👨‍👩‍👧 Parent/Guardian:</span><span class="info-value">${user.parentName || 'Not Provided'}</span></div>
+            <div class="info-row"><span class="info-label">📞 Parent Phone:</span><span class="info-value">${user.parentPhone || 'Not Provided'}</span></div>
+        `;
+        
+        // Setup logout
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../login.html';
+        });
+    </script>
+</body>
+</html>

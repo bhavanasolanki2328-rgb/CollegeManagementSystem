@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Resources</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Student Portal</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="grades.html">Grades</a></li>
+                <li><a href="resources.html" class="active">Resources</a></li>
+                <li><a href="timetable.html">Timetable</a></li>
+                <li><a href="fees.html">Fees</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-content">
+            <header>
+                <h1>Study Resources</h1>
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <span id="userRole" class="role-badge">Student</span>
+                </div>
+            </header>
+
+            <div class="dashboard-card" id="resourcesContainer"></div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+
+    <script>
+        (async () => {
+            const token = localStorage.getItem('token');
+
+            const res = await fetch('http://localhost:5000/api/resources', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const resources = await res.json();
+
+            if (resources.length) {
+                document.getElementById('resourcesContainer').innerHTML =
+                    resources.map(r => `
+                <div class="resource-item">
+                    <div class="resource-title">${r.title}</div>
+                    <div>${r.description || ''}</div>
+                    <div>${r.department} - Sem ${r.semester}</div>
+
+                   <a href="http://localhost:5000/uploads/${r.fileUrl}" target="_blank">
+    <button class="btn-download">Download</button>
+</a>
+                </div>
+            `).join('');
+            } else {
+                document.getElementById('resourcesContainer').innerHTML =
+                    "<p>No resources available</p>";
+            }
+        })();
+    </script>
+
+</body>
+
+</html>

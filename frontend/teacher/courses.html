@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>Teacher Portal</h2></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="courses.html" class="active">My Courses</a></li>
+                <li><a href="attendance.html">Mark Attendance</a></li>
+                <li><a href="grades.html">Enter Grades</a></li>
+                <li><a href="resources.html">Upload Resources</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="main-content">
+            <header><h1>My Courses</h1><div class="user-info"><span id="userName"></span><span id="userRole" class="role-badge">Teacher</span></div></header>
+            <div class="table-container">
+                <table><thead><tr><th>Course Code</th><th>Course Name</th><th>Department</th><th>Semester</th><th>Credits</th></tr></thead>
+                <tbody id="coursesList"></tbody></table>
+            </div>
+        </div>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script>
+        (async () => {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:5000/api/courses', { headers: { Authorization: `Bearer ${token}` } });
+            const courses = await res.json();
+            document.getElementById('coursesList').innerHTML = courses.map(c => `<tr><td>${c.courseCode}</td><td>${c.courseName}</td><td>${c.department}</td><td>${c.semester}</td><td>${c.credits}</td></tr>`).join('');
+        })();
+    </script>
+</body>
+</html>

@@ -38,6 +38,8 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/timetable', timetableRoutes);
 
+app.use('/uploads', express.static('uploads'));
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
